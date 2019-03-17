@@ -54,10 +54,23 @@ class navigator:
                 print("Failed to open or close the photo at " + picLink)
                 continue # Fail on a specific picture we move on to the next
     
-    # Grabs and opens pictures for loops number of times        
+    # Grabs and opens pictures for loops number of times   
+    # If loops == -1, it opens pictures until we manually close browser
+    # Else it grabs/opens pictures loops amount of times
     def openPicturesAtHashtag(self):
-        picLinks_hrefs = self.getPictures()
-        self.openPictures(picLinks_hrefs)
+        if self.loops >= 1:
+            for _ in range(0, self.loops):
+                picLinks_hrefs = self.getPictures()
+                self.openPictures(picLinks_hrefs)
+                
+        elif self.loops == -1:
+            while True:
+                picLinks_hrefs = self.getPictures()
+                self.openPictures(picLinks_hrefs)
+                
+        else:
+            print("You tried looping 0 times for whatever reason or have negative input besides -1.")
+            self.stop()
         
     # Closes open web browser and stops the program
     def stop(self):
