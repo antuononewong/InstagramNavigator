@@ -29,7 +29,7 @@ class navigator:
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2) # As you scroll more and more it takes time to load in the incoming pictures
             
-        # Searching for picture links then parsing out ones we don't need like the explore page
+        # Searching for picture links then parsing out ones not needed like the explore page
         hrefs = driver.find_elements_by_tag_name('a')
         picLinks_hrefs = [ref.get_attribute('href') for ref in hrefs]
         picLinks_hrefs = [urlparse(href).path for href in picLinks_hrefs if "https://www.instagram.com/p/" in href]
@@ -38,12 +38,26 @@ class navigator:
     
     # Clicks on each picture and shows the comments/likes/etc... then closes it and moves on to the next picture
     def openPictures(self, picLinks_hrefs : list):
-        return
+        driver = self.driver
+        if len(picLinks_hrefs) == 0:
+            print("No pictures were found. Check internet connection or getPictures() function.")
+            return
+        
+        for picLink in picLinks_hrefs:
+            try:
+                picBox = driver.find_element_by_xpath("//a[@href='" + picLink + "']")
+                driver.execute_script("arguments[0].click();", picBox)
+                time.sleep(4) # Allow picture to open
+                driver.find_element_by_class_name("ckWGn").click() # Finds close button in HTML and exits out of picture view
+                time.sleep(1) # Gives picture time to close
+            except:
+                print("Failed to open or close the photo at " + picLink)
+                continue # Fail on a specific picture we move on to the next
     
     # Grabs and opens pictures for loops number of times        
     def openPicturesAtHashtag(self):
         picLinks_hrefs = self.getPictures()
-        print(picLinks_hrefs)
+        self.openPictures(picLinks_hrefs)
         
     # Closes open web browser and stops the program
     def stop(self):
